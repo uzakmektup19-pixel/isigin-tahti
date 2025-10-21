@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Işığın Tahtı — PWA</title>
+  <meta name="description" content="Işığın Tahtı — Web & Telefon için tek dosya, premium animasyonlu PWA." />
+  <meta name="theme-color" content="#0b1324" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="data:image/png;base64,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" />
+  <style>
+    :root { --bg:#05070a; --fg:#e6fff7; --emerald:#10b981; --aqua:#22d3ee; --gold:#facc15; }
+    * { box-sizing: border-box; }
+    html,body { height: 100%; }
+    body {
+      margin:0; color:var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1400px 900px at 70% -10%, rgba(16,185,129,.18), transparent 40%),
+                  radial-gradient(900px 700px at 20% 120%, rgba(34,211,238,.08), transparent 50%), var(--bg);
+      overflow-x:hidden;
+    }
+    .sky {
+      pointer-events:none; position:fixed; inset:0;
+      background:
+        radial-gradient(600px 300px at 10% -20%, rgba(16,185,129,.25), transparent 60%),
+        radial-gradient(700px 400px at 110% 110%, rgba(250, 204, 21, .18), transparent 55%);
+      filter: blur(10px);
+      opacity:.8;
+      animation: aurora 12s ease-in-out infinite alternate;
+    }
+    @keyframes aurora {
+      0% { transform: translateY(0) scale(1); opacity:.7; }
+      100% { transform: translateY(-2%) scale(1.03); opacity:.9; }
+    }
+
+    .wrap { min-height:100dvh; display:grid; place-items:center; padding:24px; position:relative; }
+    .card {
+      max-width: 980px; width:100%;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:28px; padding:28px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.012));
+      box-shadow: 0 40px 120px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
+      text-align:center; position:relative; overflow:hidden;
+    }
+    .halo {
+      position:absolute; inset:-30%; background:
+        conic-gradient(from 0deg, rgba(16,185,129,.15), rgba(34,211,238,.1), rgba(250,204,21,.12), rgba(16,185,129,.15));
+      filter: blur(40px); z-index:-1; animation: spin 18s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    h1 {
+      font-size: clamp(42px, 7.4vw, 88px);
+      line-height:1.02; margin:0 0 12px;
+      letter-spacing:.3px; position:relative;
+      text-shadow: 0 0 20px rgba(16,185,129,.25);
+    }
+    .shine {
+      background: linear-gradient(90deg, #fff, #b7ffe9, #fff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      background-size: 200% 100%;
+      animation: shine 4.5s ease-in-out infinite;
+    }
+    @keyframes shine {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    p.sub { opacity:.92; margin:0 0 22px; font-size: clamp(16px, 2.2vw, 18px); }
+    .cta { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin-top: 14px; }
+
+    .btn {
+      font-size: clamp(18px, 2.6vw, 26px);
+      padding: 18px 26px; border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(16,185,129,.45), rgba(16,185,129,.22));
+      color:#eafff7; text-decoration:none; font-weight:900; letter-spacing:.2px;
+      backdrop-filter: blur(8px); box-shadow: 0 18px 44px rgba(16,185,129,.32);
+      cursor:pointer; position:relative; overflow:hidden;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn .wings {
+      pointer-events:none; position:absolute; inset:0; display:grid; place-items:center;
+      filter: drop-shadow(0 10px 20px rgba(34,211,238,.25));
+    }
+    .wing { width: 26px; height: 26px; border:2px solid #b7ffe9; border-radius: 0 100% 100% 100%/0 100% 100% 100%;
+             transform-origin: bottom center; opacity:.85; }
+    .left { transform: rotate(-35deg) translate(-24px, -2px); }
+    .right { transform: rotate(35deg) translate(24px, -2px); }
+    .btn:active .left { animation: flapL .4s ease; }
+    .btn:active .right { animation: flapR .4s ease; }
+    @keyframes flapL { 0% { transform: rotate(-35deg) translate(-24px,-2px);} 50% { transform: rotate(-60deg) translate(-24px,-10px);} 100% { transform: rotate(-35deg) translate(-24px,-2px);} }
+    @keyframes flapR { 0% { transform: rotate(35deg) translate(24px,-2px);} 50% { transform: rotate(60deg) translate(24px,-10px);} 100% { transform: rotate(35deg) translate(24px,-2px);} }
+
+    .ghost { background: rgba(255,255,255,.05); font-weight:700; }
+    .hint { opacity:.82; font-size:14px; margin-top:14px; }
+    footer { text-align:center; opacity:.6; font-size: 13px; margin-top: 18px; }
+
+    /* Play view */ 
+    #playview { display:none; position: fixed; inset:0; background:#0b1324; }
+    #unity-canvas { width:100%; height:100%; background:#000; touch-action:none; }
+    #loader { position: fixed; inset: 0; display:grid; place-items:center; background: radial-gradient(120% 100% at 50% 20%, rgba(16,185,129,.15), transparent), #0b1324; }
+    .bar { width: min(520px, 78vw); height: 10px; border-radius: 999px; background: rgba(255,255,255,.12); overflow:hidden; }
+    .bar > i { display:block; height:100%; width:0; background: linear-gradient(90deg, var(--emerald), var(--aqua)); }
+    .back { position: fixed; left: 12px; top: 12px; text-decoration:none; color:#bfffea; padding:10px 12px; border:1px solid rgba(255,255,255,.12); border-radius:12px; font-weight:600; }
+    .warn { position: fixed; right: 12px; top: 12px; font-size: 13px; opacity:.9; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sky, .halo, .shine { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sky"></div>
+  <div class="wrap" id="home">
+    <div class="card">
+      <div class="halo"></div>
+      <h1 class="shine">Işığın Tahtı</h1>
+      <p class="sub">Melek kanatlarının nuruyla, altın bir tahtın ışığında… Web & telefonda oynanabilir tek dosya PWA.</p>
+      <div class="cta">
+        <button class="btn" id="playBtn">
+          ▶ Oyna
+          <span class="wings">
+            <i class="wing left"></i>
+            <i class="wing right"></i>
+          </span>
+        </button>
+        <button class="btn ghost" id="a2hs">+ Ana Ekrana Ekle</button>
+      </div>
+      <div class="hint">Unity WebGL build dosyalarını <strong>Build/</strong> klasörü olarak eklediğinde “Oyna” gerçek oyunu yükleyecek.</div>
+      <footer>© Işığın Tahtı — Uzak Mektup & Mira Nova</footer>
+    </div>
+  </div>
+
+  <!-- Play View -->
+  <div id="playview">
+    <a class="back" href="#" id="backBtn">← Geri</a>
+    <div id="loader">
+      <div>
+        <div style="text-align:center; margin-bottom:10px;">Yükleniyor…</div>
+        <div class="bar"><i id="p"></i></div>
+      </div>
+    </div>
+    <canvas id="unity-canvas" tabindex="0" role="application" aria-label="Işığın Tahtı"></canvas>
+    <div class="warn" id="placeholderWarn" hidden>⚠ (Build/Build.*) henüz ekli değil. Şimdilik yer tutucu yüklendi.</div>
+  </div>
+
+  <script>
+    const manifest = {{
+      name: "Işığın Tahtı",
+      short_name: "Işığın Tahtı",
+      start_url: "./",
+      display: "standalone",
+      background_color: "#0b1324",
+      theme_color: "#0b1324",
+      icons: [
+        {{ src: "data:image/png;base64,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", sizes: "192x192", type: "image/png" }},
+        {{ src: "data:image/png;base64,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", sizes: "512x512", type: "image/png" }}
+      ]
+    }};
+    const manifestURL = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {{type: 'application/manifest+json'}}));
+    document.head.appendChild(Object.assign(document.createElement('link'), {{ rel:'manifest', href: manifestURL }}));
+
+    const swCode = "self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>self.clients.claim());";
+    if ('serviceWorker' in navigator) {{
+      const swURL = URL.createObjectURL(new Blob([swCode], {{type:'text/javascript'}}));
+      addEventListener('load', ()=>navigator.serviceWorker.register(swURL));
+    }}
+
+    let deferredPrompt;
+    addEventListener('beforeinstallprompt', (e) => {{
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('a2hs');
+      btn.style.display = 'inline-flex';
+      btn.addEventListener('click', async () => {{
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      }});
+    }});
+
+    const home = document.getElementById('home');
+    const playview = document.getElementById('playview');
+    document.getElementById('playBtn').addEventListener('click', () => {{
+      home.style.display = 'none';
+      playview.style.display = 'block';
+      bootUnity();
+    }});
+    document.getElementById('backBtn').addEventListener('click', (e) => {{
+      e.preventDefault();
+      playview.style.display = 'none';
+      home.style.display = 'grid';
+    }});
+
+    function resumeAudio() {{
+      const AC = window.AudioContext || window.webkitAudioContext; 
+      if (AC) {{
+        const a = new AC();
+        if (a.state === 'suspended') a.resume();
+      }}
+      removeEventListener('touchend', resumeAudio);
+      removeEventListener('click', resumeAudio);
+    }}
+    addEventListener('touchend', resumeAudio);
+    addEventListener('click', resumeAudio);
+
+    function bootUnity() {{
+      const buildUrl = "./Build";
+      const loaderUrl = buildUrl + "/Build.loader.js";
+      const config = {{
+        dataUrl: buildUrl + "/Build.data",
+        frameworkUrl: buildUrl + "/Build.framework.js",
+        codeUrl: buildUrl + "/Build.wasm",
+        streamingAssetsUrl: "streamingassets",
+        companyName: "Uzak Mektup",
+        productName: "Işığın Tahtı",
+        productVersion: "1.0.0"
+      }};
+      const canvas = document.getElementById("unity-canvas");
+      const progressEl = document.getElementById("p");
+      const s = document.createElement('script');
+      s.src = loaderUrl;
+      s.onload = () => {{
+        if (typeof createUnityInstance !== 'function') return showPlaceholder();
+        createUnityInstance(canvas, config, (progress) => {{
+          progressEl.style.width = (progress*100).toFixed(0) + '%';
+        }}).then(() => {{
+          document.getElementById('loader').style.display = 'none';
+        }}).catch((m)=>alert(m));
+      }};
+      s.onerror = () => showPlaceholder();
+      document.body.appendChild(s);
+    }}
+    function showPlaceholder() {{
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('placeholderWarn').hidden = false;
+      const c = document.getElementById("unity-canvas");
+      const x = c.getContext('2d');
+      const w = c.width = innerWidth;
+      const h = c.height = innerHeight;
+      x.fillStyle = '#000'; x.fillRect(0,0,w,h);
+      x.fillStyle = '#bfffea';
+      x.font = '20px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+      x.fillText('Işığın Tahtı', 24, 48);
+      x.font = '14px system-ui';
+      x.fillText('Unity WebGL build eklenince oyun burada çalışacak.', 24, 72);
+    }}
+  </script>
+</body>
+</html>
