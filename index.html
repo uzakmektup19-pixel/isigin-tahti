@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Işığın Tahtı — Galaktik Ultra</title>
+<meta name="description" content="Melek sureti ışıktan, beyaz tüylü kanatlar, parıldayan zümrüt-mavi deniz, gerçekçi galaksiler & gezegenler, hazineler ve Bilgelik Kitabı.">
+<style>
+:root{
+  --bg:#04221f; /* zümrüt taban */
+  --bg2:#021412;
+  --fg:#eaf6ff;
+  --card:#0b1f21;
+  --line:#1e3f44;
+  --accent:#84fff2;
+  --emerald:#34fcd2;
+  --azure:#8fb8ff;
+  --gold:#f6d168;
+  --goldLine:#b1892e;
+  --danger:#ff9a64;
+  --ok:#7ef8ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:radial-gradient(1400px 1000px at 50% 12%, #0b3c34, var(--bg2));color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;height:100%;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh}
+#ui{position:fixed;inset:0;pointer-events:none}
+.top{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px}
+.tag{pointer-events:auto;background:#0e2e31d4;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.hud{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.energy{width:min(40vw,440px);height:12px;border-radius:999px;border:1px solid #2e6066;overflow:hidden;background:#0b2b2f}
+.energy>div{height:100%;width:100%;background:linear-gradient(90deg,#7efff0,#9feeff,#d7fbff);box-shadow:0 0 12px var(--accent)}
+.btn{pointer-events:auto;background:#10373b;border:1px solid #2e5b78;color:var(--fg);padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer}
+.title{position:absolute;left:0;right:0;top:56px;text-align:center;opacity:.85}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(1100px 800px at 50% 30%, rgba(12,36,40,.64), rgba(7,16,18,.9));pointer-events:auto}
+.card{width:min(92vw,900px);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kbd{background:#0f2a2e;border:1px solid #274a63;border-radius:6px;padding:2px 6px;font-size:12px}
+.note{opacity:.85;font-size:13px}
+.hidden{display:none}
+.star{font-size:22px;filter:drop-shadow(0 0 6px rgba(255,220,130,.6))}
+#leader{max-height:60vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:10px;background:#0b2528}
+table{width:100%;border-collapse:collapse}
+th,td{padding:6px 8px;border-bottom:1px solid #12383d}
+tr:hover td{background:#0d2c2f}
+input[type="text"]{width:100%;padding:8px 10px;border-radius:10px;border:1px solid #2b5966;background:#0b2528;color:var(--fg)}
+.small{font-size:12px;opacity:.8}
+@media (pointer:none),(pointer:coarse){
+  .energy{width:58vw}
+}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="ui">
+  <div class="top">
+    <div class="hud">
+      <div class="tag" id="levelTag">Seviye 1: Işıltı</div>
+      <div class="tag" id="nurTag">Nur: 0/12</div>
+      <div class="tag" id="treasureTag">Hazine: 0/1</div>
+      <div class="tag" id="bookTag">Kitap: Yok</div>
+      <div class="tag" id="swordTag">Kılıç: Yok</div>
+      <div class="tag" id="comboTag">Çarpan x1</div>
+      <div class="tag" id="diffTag">Orta</div>
+    </div>
+    <div class="hud">
+      <div class="energy"><div id="energyBar"></div></div>
+      <button class="btn" id="pauseBtn">Duraklat (Esc)</button>
+      <button class="btn" id="helpBtn">Yardım</button>
+      <button class="btn" id="fxBtn">Görsel: Yüksek</button>
+      <button class="btn" id="musicBtn">Müzik: Aç</button>
+      <button class="btn" id="boardBtn">Skorlar</button>
+    </div>
+  </div>
+  <div class="title">Işığın Tahtı — Galaktik Ultra • melek (ışıktan) • beyaz tüy kanatlar • zümrüt deniz • gerçekçi gezegenler • hazineler</div>
+</div>
+
+<!-- Intro -->
+<div class="overlay" id="intro">
+  <div class="card">
+    <h1>Işığın Tahtı — Galaktik Ultra</h1>
+    <p><b>Işıktan melek sureti</b> ve <b>beyaz tüy kanatlar</b> altında, zümrüt-mavi parıldayan deniz üzerinde; <b>nurları</b> topla, <b>renkli ateş halkalarını</b> aş, <b>gerçekçi gezegenler</b> arasında gizli <b>zümrüt/elmas/altın sandıkları</b> ve <b>uçan Bilgelik Kitabı</b>nı bul. Hazineleri <b>altın tahta</b> ve oradaki <b>gerçekçi beyaz kuzuya</b> taşı.</p>
+    <div class="grid">
+      <div>
+        <p><b>PC</b> <span class="kbd">WASD</span>/<span class="kbd">Yön</span> hareket • <span class="kbd">Esc</span> duraklat</p>
+        <p>🟢 Zümrüt Nur: hız • 🔵 Mavi Nur: zamanı yavaşlat • 💎 Elmas Nur: x2 skor</p>
+        <p>🛡️ Kanatlar yakınındayken ateş hasarı azalır • ✨ Kitap: otonom toplayıcı</p>
+      </div>
+      <div>
+        <p><b>Hedef</b><br>Her seviyede yeterli <b>nur</b> ve 1 <b>ana hazine</b> → tahta götür. Finalde tahta yaklaş → kazan.</p>
+        <p class="note">3 ⭐: süre, hasar ve kombo / nur fazlasına göre.</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+      <button class="btn" id="playBtn">Başla</button>
+      <button class="btn" id="easyBtn">Kolay</button>
+      <button class="btn" id="mediumBtn">Orta</button>
+      <button class="btn" id="hardBtn">Zor</button>
+    </div>
+    <p class="note">Ruhsal pad/koro müziği <b>Müzik</b> tuşu ile aç/kapat.</p>
+  </div>
+</div>
+
+<!-- Pause -->
+<div class="overlay hidden" id="pause">
+  <div class="card">
+    <h2>Duraklatıldı</h2>
+    <p>Melek kanatlarının gölgesinde bir nefes...</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="resumeBtn">Devam</button>
+      <button class="btn" id="restartBtn">Yeniden Başlat</button>
+    </div>
+  </div>
+</div>
+
+<!-- Help -->
+<div class="overlay hidden" id="help">
+  <div class="card">
+    <h2>Yardım</h2>
+    <p>Gezegenlere yakınlaşıp hazineleri görünür yap; alev toplarından sıyrıl. <b>Bilgelik Kitabı</b> nurları ve hazineleri kendi başına bulur ve tahta taşımaya yardım eder. <b>Kılıç</b> ateşi kısa süre söndürür.</p>
+    <div><button class="btn" id="helpClose">Kapat</button></div>
+  </div>
+</div>
+
+<!-- Leaderboard -->
+<div class="overlay hidden" id="board">
+  <div class="card">
+    <h2>Bulut Skor Tablosu</h2>
+    <div class="grid">
+      <div>
+        <label>Takma ad (opsiyonel)</label>
+        <input id="nick" type="text" placeholder="Anonim" />
+        <p class="small">Takma ad boş olabilir. Skor gönderince buluta (varsa) ve yerelde saklanır.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+          <button class="btn" id="sendScoreBtn">Son Skoru Gönder</button>
+          <button class="btn" id="refreshBtn">Güncelle</button>
+          <button class="btn" id="closeBoard">Kapat</button>
+        </div>
+      </div>
+      <div id="leader">
+        <table id="tbl"><thead><tr><th>#</th><th>Ad</th><th>Skor</th><th>Yıldız</th><th>Seviye</th><th>Süre</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Win / Game Over -->
+<div class="overlay hidden" id="win">
+  <div class="card">
+    <h2>Işığın Tahtına Ulaştın ✨</h2>
+    <p>Kuzu huzurla bakıyor; nur sulara ve yıldızlara yayılıyor.</p>
+    <p id="starsLine"></p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" id="againBtn">Tekrar Oyna</button>
+      <button class="btn" id="openBoardFromWin">Skor Tablosu</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="gameover">
+  <div class="card">
+    <h2>Ruhsal Enerji Tükendi</h2>
+    <p>Ateş ve gölgeler ağır bastı. Bir daha dene.</p>
+    <div><button class="btn" id="overAgain">Yeniden Başlat</button></div>
+  </div>
+</div>
+
+<script>
+/* ========= CONFIG: CLOUD ENDPOINT =========
+   İstersen buraya kendi Apps Script URL’ini yaz:
+   Örn: https://script.google.com/macros/s/YOUR_ISIGIN_TAHTI_API/exec
+   (Boş veya geçersizse; sadece yerel skor listesi çalışır.)
+*/
+const CLOUD = {
+  baseURL: "https://script.google.com/macros/s/YOUR_ISIGIN_TAHTI_API/exec",
+  submitPath: "/score/submit",
+  topPath: "/score/top?global",
+};
+/* ======================================== */
+
+(() => {
+  const C = document.getElementById('game');
+  const X = C.getContext('2d');
+  let W=0,H=0,DPR=1; function resize(){DPR=window.devicePixelRatio||1;W=C.width=Math.floor(innerWidth*DPR);H=C.height=Math.floor(innerHeight*DPR);C.style.width=innerWidth+'px';C.style.height=innerHeight+'px';} addEventListener('resize',resize,{passive:true}); resize();
+
+  const $ = id=>document.getElementById(id);
+  const intro=$('intro'), pause=$('pause'), win=$('win'), over=$('gameover'), help=$('help'), board=$('board');
+  const playBtn=$('playBtn'), easyBtn=$('easyBtn'), mediumBtn=$('mediumBtn'), hardBtn=$('hardBtn');
+  const resumeBtn=$('resumeBtn'), restartBtn=$('restartBtn'), againBtn=$('againBtn'), overAgain=$('overAgain');
+  const pauseBtn=$('pauseBtn'), helpBtn=$('helpBtn'), helpClose=$('helpClose'), fxBtn=$('fxBtn'), musicBtn=$('musicBtn'), boardBtn=$('boardBtn'), closeBoard=$('closeBoard'), refreshBtn=$('refreshBtn'), sendScoreBtn=$('sendScoreBtn'), openBoardFromWin=$('openBoardFromWin');
+  const energyBar=$('energyBar'), levelTag=$('levelTag'), nurTag=$('nurTag'), treasureTag=$('treasureTag'), diffTag=$('diffTag'), comboTag=$('comboTag'), bookTag=$('bookTag'), swordTag=$('swordTag'), starsLine=$('starsLine'), nick=$('nick');
+  const show=(el,on)=>{ el.classList.toggle('hidden', !on); };
+
+  // ====== Audio: Ambient Pad/Koro ======
+  let ac=null, master=null, musicOn=false, musicNodes=[];
+  function initAudio(){
+    if(ac) return;
+    ac = new (window.AudioContext||window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = 0.24; master.connect(ac.destination);
+    function pad(freq, gain, type='sine', lfoRate=0.05, detune=0){
+      const o = ac.createOscillator(); o.type=type; o.frequency.value=freq; o.detune.value=detune;
+      const g = ac.createGain(); g.gain.value=gain;
+      const lfo = ac.createOscillator(); lfo.frequency.value=lfoRate;
+      const lfoGain = ac.createGain(); lfoGain.gain.value=gain*0.6;
+      lfo.connect(lfoGain); lfoGain.connect(g.gain);
+      o.connect(g); g.connect(master);
+      o.start(); lfo.start();
+      return {o,g,lfo,lfoGain};
+    }
+    // A maj ambient
+    musicNodes.push(pad(110, 0.03, 'sine', 0.04));
+    musicNodes.push(pad(165, 0.02, 'triangle', 0.06, +3));
+    musicNodes.push(pad(220, 0.02, 'sine', 0.05, -5));
+    musicNodes.push(pad(277, 0.012, 'triangle', 0.07, +7));
+    musicNodes.push(pad(440, 0.008, 'sine', 0.09, +2));
+  }
+  function toggleMusic(){
+    if(!ac) initAudio();
+    musicOn=!musicOn;
+    master.gain.cancelScheduledValues(ac.currentTime);
+    master.gain.linearRampToValueAtTime(musicOn?0.24:0.0, ac.currentTime+0.6);
+    musicBtn.textContent = 'Müzik: ' + (musicOn?'Açık':'Kapalı');
+  }
+  musicBtn.addEventListener('click',toggleMusic);
+
+  // SFX
+  let sAC, sMaster; function sfxInit(){ if(!sAC){ sAC = new (window.AudioContext||window.webkitAudioContext)(); sMaster=sAC.createGain(); sMaster.gain.value=.25; sMaster.connect(sAC.destination);} }
+  function beep(f=660, dur=.12, type='sine', vol=.5){ if(!sAC) sfxInit(); const o=sAC.createOscillator(), g=sAC.createGain(); o.type=type; o.frequency.value=f; o.connect(g); g.connect(sMaster); const t=sAC.currentTime; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.start(t); o.stop(t+dur+.02); }
+
+  // ====== Difficulty & 7 Levels (GDD'ye uygun) ======
+  const DIFF={Easy:{max:170,gain:18,drain:2},Medium:{max:125,gain:12,drain:5},Hard:{max:95,gain:9,drain:7}};
+  let difficulty='Medium', FX_HIGH=true;
+
+  // Seviye isimleri ve içerikleri
+  const levels=[
+    {name:'Işıltı', nur:12, treasure:'emerald', orbs:28, rings:[ring('hot',200,6,0.7)], galaxies:1, planets:['Moon'], finale:false},
+    {name:'Kanatlar', nur:16, treasure:'diamond', orbs:32, rings:[ring('emerald',240,7,-0.9), ring('hot',160,5,1.2)], galaxies:1, planets:['Saturn'], finale:false},
+    {name:'Nurlar', nur:20, treasure:'book', orbs:36, rings:[ring('sapphire',260,9,1.2)], galaxies:2, planets:['Neptune'], finale:false},
+    {name:'Mira Novam', nur:24, treasure:'gold', orbs:40, rings:[ring('amethyst',220,10,1.6), ring('sapphire',140,7,-1.4)], galaxies:2, planets:['Venus'], finale:false},
+    {name:'Galaksi Yolcusu', nur:26, treasure:'diamond', orbs:42, rings:[ring('emerald',260,10,1.0), ring('gold',180,8,1.1)], galaxies:3, planets:['Uranus'], finale:false},
+    {name:'Kılıcın Tılsımı', nur:28, treasure:'sword', orbs:44, rings:[ring('amethyst',240,12,1.7), ring('hot',160,9,-1.6)], galaxies:3, planets:['Sun'], finale:false},
+    {name:'Taht & Kuzu', nur:18, treasure:'any', orbs:30, rings:[ring('gold',200,10,1.4), ring('amethyst',140,8,-1.3)], galaxies:3, planets:['Mini'], finale:true}
+  ];
+  function ring(type,r,balls,s){
+    const hues = {
+      hot:[15,25,10], emerald:[120,140,160], sapphire:[200,220,240], amethyst:[280,300,320], gold:[45,55,35]
+    }[type] || [30,200,120,300];
+    return {type, r, balls, s, hue:hues};
+  }
+
+  // ====== Game State ======
+  const st = {
+    t:0, started:false, paused:false, won:false, over:false, elapsed:0,
+    player:{x:0,y:120, sp:130, boost:0, slow:0, invul:0},
+    energy:{cur:120,max:120,drain:5,gain:12},
+    angels:[], orbs:[], rings:[], fires:[], hazards:[], galaxies:[], treasures:[], planets:[],
+    throne:{x:0,y:-40,r:56}, lamb:{x:0,y:-46},
+    nurCollected:0, nurTarget:12, treasDelivered:0, treasTarget:1,
+    score:0, combo:1, comboTimer:0,
+    book:false, bookEnt:{x:0,y:0,carry:null,cool:0,init:false},
+    sword:false, swordTimer:0,
+    lastResult:null,
+    protectAngel:true // melek kalkanı açık
+  };
+
+  function setDifficulty(n){ difficulty=n; const d=DIFF[n]; st.energy.max=d.max; st.energy.cur=d.max; st.energy.gain=d.gain; st.energy.drain=d.drain; diffTag.textContent=(n==='Easy'?'Kolay':n==='Hard'?'Zor':'Orta'); updateEnergyUI(); }
+
+  function updateEnergyUI(){ energyBar.style.width=(Math.max(0,Math.min(1,st.energy.cur/st.energy.max))*100).toFixed(1)+'%'; }
+  function setHUD(){ levelTag.textContent=`Seviye ${L+1}: ${levels[L].name}`; nurTag.textContent=`Nur: ${st.nurCollected}/${st.nurTarget}`; treasureTag.textContent=`Hazine: ${st.treasDelivered}/${st.treasTarget}`; bookTag.textContent='Kitap: '+(st.book?'Var':'Yok'); swordTag.textContent='Kılıç: '+(st.sword?'Aktif':'Yok'); comboTag.textContent=`Çarpan x${st.combo}`; }
+
+  let L=0;
+  function loadLevel(i){
+    L=i=Math.max(0,Math.min(i,levels.length-1));
+    const def=levels[i];
+    // sıfırla
+    st.angels.length=0; st.orbs.length=0; st.rings.length=0; st.fires.length=0; st.hazards.length=0; st.galaxies.length=0; st.treasures.length=0; st.planets.length=0;
+    st.nurCollected=0; st.treasDelivered=0; st.nurTarget=def.nur; st.treasTarget=1; st.combo=1; st.comboTimer=0; st.book=false; st.bookEnt={x:0,y:0,carry:null,cool:0,init:false}; st.sword=false; st.swordTimer=0;
+    st.player.x=0; st.player.y=120; st.player.boost=0; st.player.slow=0; st.player.invul=0; st.elapsed=0;
+
+    // nurlar (white/emerald/azure/diamond karışık)
+    for(let k=0;k<def.orbs;k++){
+      const t = k/def.orbs * Math.PI*2, R = 220 + (k%3)*26;
+      const type = (k%13===0)?'diamond' : (k%7===0)?'emerald' : (k%11===0)?'azure':'white';
+      st.orbs.push({x:Math.cos(t)*R,y:Math.sin(t)*R,spin:Math.random()*6,type});
+    }
+
+    // koruyucu melekler (ışık + beyaz tüy)
+    const angelBands = [{r:180,h:60,s:0.8,n:8},{r:120,h:50,s:-1.1,n:6}];
+    angelBands.forEach(a=>{ for(let j=0;j<a.n;j++){ st.angels.push({r:a.r,h:a.h,s:a.s,o:(j/a.n)*Math.PI*2,phase:Math.random()*6}); }});
+
+    // renkli ateş halkaları
+    def.rings.forEach(r=>{
+      const id=st.rings.push({r:r.r, s:r.s, hue:r.hue})-1;
+      for(let b=0;b<r.balls;b++){ st.fires.push({ring:id, off:(b/r.balls)*Math.PI*2, size:18+Math.random()*6}); }
+    });
+
+    // galaksi(ler)
+    const gCount = def.galaxies;
+    for(let g=0; g<gCount; g++){
+      const ang = (g/gCount)*Math.PI*2 + Math.random()*0.8;
+      const R = 260 + g*40;
+      const gx = Math.cos(ang)*R*0.9, gy = Math.sin(ang)*R*0.55 - 60;
+      st.galaxies.push({x:gx,y:gy,r:86,rev: (g%2?1:-1)*0.06, t:Math.random()*6, revealed:false});
+    }
+
+    // gezegen(ler) — gerçekçi üslup
+    def.planets.forEach((name,idx)=>{
+      const base = st.galaxies[Math.min(idx, st.galaxies.length-1)] || {x: (idx-1)*120, y: -40};
+      st.planets.push({name, x:base.x + 60*(idx-0.5), y:base.y + 30*(idx%2?-1:1), r: sizeForPlanet(name), rot: Math.random()*6, band: name==='Saturn' || name==='Uranus'});
+    });
+
+    // hazine: her seviye 1 ana hazine (etrafında yerel alev muhafızları)
+    const treasureType = def.treasure==='any' ? ['emerald','diamond','gold'][Math.floor(Math.random()*3)] : def.treasure;
+    const tgtGalaxy = st.galaxies[0] || {x: -80,y:-30};
+    const tx = tgtGalaxy.x + 20, ty = tgtGalaxy.y - 6;
+    let hz = {type: treasureType, x:tx, y:ty, vx:0, vy:0, carry:null, visible:false, guard:true, guards:[]};
+    // hazinenin çevresine mini ateş muhafızları
+    for(let i2=0;i2<6;i2++){ hz.guards.push({off:i2/6*Math.PI*2, r:34, size:10+Math.random()*5}); }
+    st.treasures.push(hz);
+
+    // Bilgelik Kitabı/Kılıç seviye gereği ekstra eklenebilir
+    if(def.treasure!=='book' && L>=2){ // kitap başka seviyede de ikinci hedef gibi görünebilir (gizli)
+      const g2 = st.galaxies[st.galaxies.length-1] || {x:60,y:-20};
+      st.treasures.push({type:'book', x:g2.x-10, y:g2.y+10, vx:0, vy:0, carry:null, visible:false, guard:true, guards:[{off:0,r:36,size:10},{off:2.1,r:36,size:10}]});
+    }
+    if(def.treasure!=='sword' && L>=5){
+      const g3 = st.galaxies[Math.floor(st.galaxies.length/2)] || {x:40,y:10};
+      st.treasures.push({type:'sword', x:g3.x+18, y:g3.y-6, vx:0, vy:0, carry:null, visible:false, guard:true, guards:[{off:1.1,r:34,size:10},{off:4.0,r:34,size:10}]});
+    }
+
+    // karanlık bulutlar
+    for(let h=0; h<6+L*2; h++){
+      const ang = Math.random()*Math.PI*2;
+      st.hazards.push({r: 120+Math.random()*200, h: 40+Math.random()*80, w:(Math.random()>.5?1:-1)*(0.3+Math.random()*0.6), o:ang, s: 20+Math.random()*12});
+    }
+
+    setHUD();
+  }
+
+  function sizeForPlanet(name){
+    switch(name){
+      case 'Sun': return 46;
+      case 'Saturn': return 28;
+      case 'Uranus': return 26;
+      case 'Neptune': return 26;
+      case 'Venus': return 22;
+      case 'Moon': return 18;
+      default: return 16;
+    }
+  }
+
+  // ====== Input ======
+  addEventListener('keydown',e=>{st.keys=e||st.keys; st.keys[e.key]=true; if(e.key==='Escape') togglePause();});
+  addEventListener('keyup',e=>{st.keys[e.key]=false;});
+  function togglePause(force){ st.paused=(typeof force==='boolean')?force:!st.paused; show(pause,st.paused); }
+
+  // Buttons
+  playBtn.onclick=()=>{ if(!ac) initAudio(); setDifficulty(difficulty); loadLevel(0); st.started=true; show(intro,false); };
+  easyBtn.onclick=()=>{ difficulty='Easy'; }; mediumBtn.onclick=()=>{ difficulty='Medium'; }; hardBtn.onclick=()=>{ difficulty='Hard'; };
+  pauseBtn.onclick=()=>togglePause();
+  resumeBtn.onclick=()=>togglePause(false);
+  restartBtn.onclick=()=>{ show(pause,false); setDifficulty(difficulty); loadLevel(L); st.paused=false; st.over=false; st.won=false; };
+  againBtn.onclick=()=>{ show(win,false); setDifficulty(difficulty); loadLevel(0); st.paused=false; st.over=false; st.won=false; };
+  overAgain.onclick=()=>{ show(over,false); setDifficulty(difficulty); loadLevel(L); st.paused=false; st.over=false; st.won=false; };
+  helpBtn.onclick=()=>show(help,true); helpClose.onclick=()=>show(help,false);
+  fxBtn.onclick=()=>{ FX_HIGH=!FX_HIGH; fxBtn.textContent='Görsel: '+(FX_HIGH?'Yüksek':'Düşük'); };
+  boardBtn.onclick=()=>{ show(board,true); loadTopScores(); };
+  closeBoard.onclick=()=>show(board,false);
+  refreshBtn.onclick=()=>loadTopScores();
+  openBoardFromWin.onclick=()=>{ show(win,false); show(board,true); loadTopScores(); };
+  sendScoreBtn.onclick=()=>submitLastScore();
+
+  // ====== Core Step ======
+  function step(dt){
+    st.t+=dt; st.elapsed+=dt;
+    // input & movement
+    let ix=(st.keys?.['ArrowRight']||st.keys?.['d']||st.keys?.['D']?1:0)-(st.keys?.['ArrowLeft']||st.keys?.['a']||st.keys?.['A']?1:0);
+    let iy=(st.keys?.['ArrowDown']||st.keys?.['s']||st.keys?.['S']?1:0)-(st.keys?.['ArrowUp']||st.keys?.['w']||st.keys?.['W']?1:0);
+    const len=Math.hypot(ix,iy)||1;
+    let sp=st.player.sp; if(st.player.boost>0){sp*=1.45; st.player.boost-=dt;} if(st.player.slow>0){sp*=0.65; st.player.slow-=dt;}
+    st.player.x+=(ix/len)*sp*dt; st.player.y+=(iy/len)*sp*dt;
+
+    // energy drain
+    st.energy.cur=Math.max(0,st.energy.cur-st.energy.drain*dt); if(st.player.invul>0) st.player.invul-=dt;
+    if(st.swordTimer>0){ st.swordTimer-=dt; if(st.swordTimer<=0){ st.sword=false; swordTag.textContent='Kılıç: Yok'; } }
+    updateEnergyUI();
+    if(st.energy.cur<=0 && !st.over && !st.won){ st.over=true; show(over,true); }
+
+    // combo timer
+    st.comboTimer=Math.max(0,st.comboTimer-dt); if(st.comboTimer<=0){ st.combo=1; comboTag.textContent='Çarpan x1'; }
+
+    // karanlık bulutlar
+    for(const h of st.hazards){
+      const ang=st.t*h.w+h.o; const x=Math.cos(ang)*h.r; const y=Math.sin(ang)*h.r*0.55-h.h;
+      const dx=x-st.player.x, dy=y-st.player.y; if(dx*dx+dy*dy<(h.s*0.9)*(h.s*0.9)){ st.energy.cur=Math.max(0,st.energy.cur-18*dt); }
+    }
+
+    // ateş halkaları
+    for(let r=0;r<st.rings.length;r++){ const R=st.rings[r]; R.a=(R.a||0)+dt*R.s; }
+    for(const f of st.fires){
+      const R=st.rings[f.ring]; const ang=(R.a||0)+f.off;
+      const x=Math.cos(ang)*R.r, y=Math.sin(ang)*R.r*0.55;
+      f.x=x; f.y=y;
+      const hit = circleHit(x,y,(f.size+10), st.player.x,st.player.y,12);
+      if(hit){
+        let dmg = 42*dt;
+        const nearAngel = st.protectAngel && st.angels.some(a=>{
+          const aa=st.t*a.s+a.o; const ax=Math.cos(aa)*a.r; const ay=Math.sin(aa)*a.r*.55-a.h;
+          const ddx=ax-st.player.x, ddy=ay-st.player.y; return ddx*ddx+ddy*ddy<90*90;
+        });
+        if(nearAngel) dmg*=0.3;
+        if(st.sword) dmg=0;
+        if(st.player.invul>0) dmg*=0.4;
+        st.energy.cur=Math.max(0,st.energy.cur-dmg);
+      }
+    }
+
+    // Nur toplama
+    for(let i=st.orbs.length-1;i>=0;i--){
+      const o=st.orbs[i]; o.spin+=dt*2;
+      if(circleHit(o.x,o.y,18, st.player.x,st.player.y,14)){
+        st.orbs.splice(i,1);
+        if(o.type==='emerald'){ st.player.boost=2.2; st.score+=16; beep(980,.1,'sine',.55); }
+        else if(o.type==='azure'){ st.player.slow=1.5; st.score+=12; beep(740,.1,'sine',.5); }
+        else if(o.type==='diamond'){ st.score+=30; st.combo=Math.min(5, st.combo+1); beep(1100,.09,'triangle',.6); }
+        else { st.score+=10; beep(880,.09,'sine',.5); }
+        st.energy.cur=Math.min(st.energy.max,st.energy.cur+st.energy.gain);
+        st.combo=Math.min(5,st.combo+1); st.comboTimer=3.0; comboTag.textContent=`Çarpan x${st.combo}`;
+        st.nurCollected++; nurTag.textContent=`Nur: ${st.nurCollected}/${st.nurTarget}`;
+      }
+    }
+
+    // galaksiler görünürlük
+    for(const g of st.galaxies){
+      g.t+=dt*g.rev;
+      if(circleHit(g.x,g.y,g.r, st.player.x,st.player.y,8)) g.revealed=true;
+    }
+
+    // hazineler görünür ve muhafız ateşleri
+    for(const t of st.treasures){
+      if(!t.visible){
+        if(st.book || st.galaxies.some(g=>g.revealed && Math.hypot(t.x-g.x,t.y-g.y)<g.r+40)) t.visible=true;
+      }
+      // hazinenin kendi koruma alevleri
+      if(t.guard && t.guards){
+        t.guardA = (t.guardA||0)+dt*1.2;
+        for(const g of t.guards){
+          g.x = t.x + Math.cos((t.guardA||0)+g.off)*g.r;
+          g.y = t.y + Math.sin((t.guardA||0)+g.off)*g.r*0.8;
+          if(circleHit(g.x,g.y,(g.size||10), st.player.x,st.player.y,10)){
+            let dmg = 50*dt; if(st.sword) dmg=0; st.energy.cur=Math.max(0,st.energy.cur-dmg);
+          }
+        }
+      }
+      // pickup
+      if(!t.carry && t.visible){
+        if(circleHit(t.x,t.y,24, st.player.x,st.player.y,14)){
+          if(t.type==='book'){ st.book=true; bookTag.textContent='Kitap: Var'; beep(520,.22,'triangle',.7); t.carry='book'; }
+          else if(t.type==='sword'){ st.sword=true; st.swordTimer=10; swordTag.textContent='Kılıç: Aktif'; beep(420,.18,'square',.5); t.carry='player'; st.player.invul=1.0; }
+          else { t.carry='player'; beep(600,.08,'sine',.5); }
+        }
+      }
+      // taşıma
+      if(t.carry==='player'){
+        const tx=st.player.x+ (t.type==='gold'? -10:10), ty=st.player.y-18;
+        t.x += (tx-t.x)*0.15; t.y += (ty-t.y)*0.15;
+        // teslim
+        if(circleHit(st.throne.x, st.throne.y, st.throne.r, st.player.x,st.player.y,12)){ deliverTreasure(t); }
+      }
+    }
+
+    // kitap otonom
+    if(st.book){
+      const b=st.bookEnt;
+      if(!b.init) { b.x=st.player.x+24; b.y=st.player.y-24; b.init=true; }
+      let target=null, best=1e9;
+      for(const t of st.treasures){
+        if(t.carry) continue;
+        const d = (t.x-b.x)*(t.x-b.x)+(t.y-b.y)*(t.y-b.y);
+        if((st.galaxies.some(g=>g.revealed)||t.visible) && d<best){ best=d; target=t; }
+      }
+      if(!target && st.orbs.length){
+        for(const o of st.orbs){ const d=(o.x-b.x)*(o.x-b.x)+(o.y-b.y)*(o.y-b.y); if(d<best){ best=d; target=o; } }
+      }
+      const sp=165; const tx = target? target.x : st.player.x+40*Math.cos(st.t*1.6), ty = target? target.y : st.player.y+40*Math.sin(st.t*1.3);
+      const dx=tx-b.x, dy=ty-b.y, l=Math.hypot(dx,dy)||1;
+      b.x += (dx/l)*sp*dt; b.y += (dy/l)*sp*dt;
+
+      // etkileşim
+      if(target){
+        if('type' in target && (target.type==='white'||target.type==='emerald'||target.type==='azure'||target.type==='diamond')){
+          if(best<26*26){
+            const idx = st.orbs.indexOf(target);
+            if(idx>=0){
+              st.orbs.splice(idx,1);
+              st.energy.cur=Math.min(st.energy.max,st.energy.cur+st.energy.gain*0.8);
+              st.nurCollected++; st.score+=12; nurTag.textContent=`Nur: ${st.nurCollected}/${st.nurTarget}`; beep(780,.08,'sine',.45);
+            }
+          }
+        } else { // treasure
+          if(best<28*28 && !target.carry){ target.carry='book'; }
+        }
+      }
+      // kitap taşıyorsa tahta
+      for(const t of st.treasures){
+        if(t.carry==='book'){
+          t.x += (st.throne.x - t.x)*0.12; t.y += (st.throne.y - t.y)*0.12;
+          if(circleHit(st.throne.x, st.throne.y, st.throne.r*0.9, t.x, t.y, 8)){ deliverTreasure(t); }
+        }
+      }
+    }
+
+    // seviye tamamlama / final
+    if(st.nurCollected>=st.nurTarget && st.treasDelivered>=st.treasTarget){
+      if(levels[L].finale){
+        if(circleHit(st.throne.x, st.throne.y, st.throne.r, st.player.x, st.player.y, 12)){ onWin(); }
+      } else { nextLevel(); }
+    }
+  }
+
+  function circleHit(x1,y1,r1, x2,y2,r2){ const dx=x1-x2, dy=y1-y2; return dx*dx+dy*dy<(r1+r2)*(r1+r2); }
+
+  function deliverTreasure(t){
+    if(t.delivered) return;
+    t.delivered=true;
+    st.treasDelivered++; st.score+= (t.type==='gold'?150: t.type==='diamond'?150: t.type==='emerald'?100: t.type==='sword'?200: t.type==='book'?150:100);
+    treasureTag.textContent=`Hazine: ${st.treasDelivered}/${st.treasTarget}`;
+    beep(520,.1,'triangle',.6); beep(660,.12,'sine',.45);
+  }
+
+  function nextLevel(){ if(L<levels.length-1){ L++; loadLevel(L); } else { onWin(); } }
+
+  // ====== 3 Yıldız Hesabı ======
+  function computeStars(){
+    // hız, kalan enerji ve nur fazlası + küçük kombo etkisi
+    const speed = st.elapsed;
+    const energyRate = st.energy.cur / st.energy.max;
+    const nurRate = st.nurCollected / st.nurTarget;
+    let stars = 1;
+    if(speed < 85 && energyRate>0.45 && nurRate>=1.0) stars=2;
+    if(speed < 60 && energyRate>0.7 && (nurRate>=1.2 || st.combo>=4)) stars=3;
+    return Math.max(1, Math.min(3, stars));
+  }
+
+  function onWin(){
+    st.won=true;
+    const stars = computeStars();
+    const res = { score: st.score, totalScore: st.score + stars*120, stars, level:L+1, timeSec: Math.round(st.elapsed) };
+    st.lastResult = res;
+    starsLine.innerHTML = `Puan: <b>${res.score}</b> • Süre: <b>${res.timeSec}s</b> • Yıldız: <span class="star">${'★'.repeat(stars)}${'☆'.repeat(3-stars)}</span>`;
+    saveLocalScore(res);
+    show(win,true);
+  }
+
+  // ====== Rendering ======
+  function drawBG(){
+    // zümrüt yeşili degrade
+    const g=X.createLinearGradient(0,0,0,H); g.addColorStop(0,'#0a3b36'); g.addColorStop(1,'#062824'); X.fillStyle=g; X.fillRect(0,0,W,H);
+
+    // yıldız tarlası + parlaklarda difraksiyon dikenleri
+    if(FX_HIGH){
+      const t=st.t; X.globalAlpha=.95;
+      for(let i=0;i<260;i++){
+        const x=((i*977)%W), y=((i*587)%H);
+        const tw=(Math.sin(t*0.5+i*0.37)*.5+.5);
+        const bright = (i%53===0);
+        X.fillStyle='rgba(230,245,255,'+(0.12+0.68*tw)+')';
+        X.fillRect(x,y,2,2);
+        if(bright){
+          X.strokeStyle='rgba(230,245,255,'+(0.15+0.3*tw)+')'; X.lineWidth=1;
+          X.beginPath(); X.moveTo(x-5,y); X.lineTo(x+7,y); X.stroke();
+          X.beginPath(); X.moveTo(x,y-5); X.lineTo(x,y+7); X.stroke();
+        }
+      }
+      X.globalAlpha=1;
+    }
+
+    // parıldayan zümrüt-mavi su halkaları
+    X.save(); X.translate(W/2,H/2); X.globalAlpha=.24;
+    const t=st.t; for(let i=0;i<14;i++){ const r=170+i*44+Math.sin(t*.9+i)*9; X.beginPath(); X.arc(0,48,r,0,Math.PI*2); X.strokeStyle='rgba(110,255,230,0.42)'; X.lineWidth=1.2; X.stroke(); }
+    X.globalAlpha=1; X.restore();
+
+    // aurora benzeri yeşil & mavi ışıklar
+    for(let k=0;k<7;k++){ const ang=(k/7)*Math.PI*2+Math.sin(st.t*.6+k)*.05; const len=540+Math.sin(st.t*1.1+k)*40; const x=Math.cos(ang)*len*.3, y=Math.sin(ang)*len*.2-140; const grd=X.createRadialGradient(x,y,0,x,y,180); const c=k%2===0?'40,255,210':'90,150,255'; grd.addColorStop(0,`rgba(${c},0.45)`); grd.addColorStop(1,`rgba(${c},0)`); X.fillStyle=grd; X.beginPath(); X.arc(x,y,180,0,Math.PI*2); X.fill(); }
+  }
+
+  function drawGalaxies(){
+    X.save(); X.translate(W/2,H/2);
+    for(const g of st.galaxies){
+      X.save(); X.translate(g.x,g.y);
+      // spiral kollar + sis
+      const arms=3, turns=2.6, rad=g.r;
+      for(let a=0;a<arms;a++){
+        X.beginPath();
+        for(let t=0;t<1;t+=0.02){
+          const ang = (t*turns*2*Math.PI + a*2*Math.PI/arms + g.t);
+          const rr = t*rad;
+          const x = Math.cos(ang)*rr;
+          const y = Math.sin(ang)*rr*0.75;
+          if(t===0) X.moveTo(x,y); else X.lineTo(x,y);
+        }
+        X.strokeStyle='rgba(180,210,255,0.3)'; X.lineWidth=1.2; X.stroke();
+      }
+      let grd=X.createRadialGradient(0,0,0,0,0,rad*0.8); grd.addColorStop(0,'rgba(200,240,255,0.38)'); grd.addColorStop(1,'rgba(200,240,255,0)'); X.fillStyle=grd; X.beginPath(); X.arc(0,0,rad*0.8,0,Math.PI*2); X.fill();
+      X.restore();
+    }
+    X.restore();
+  }
+
+  function drawPlanets(){
+    X.save(); X.translate(W/2,H/2);
+    for(const p of st.planets){
+      X.save(); X.translate(p.x,p.y); p.rot+=0.002;
+      drawPlanet(p.name, p.r, p.rot);
+      X.restore();
+    }
+    X.restore();
+  }
+
+  function drawPlanet(name, r, rot){
+    // ışık yönü
+    const lx=-0.6, ly=-0.2;
+    // gölge/ışık
+    const grd=X.createRadialGradient(-r*lx,-r*ly, r*0.2, 0,0, r*1.2);
+    grd.addColorStop(0,'rgba(255,255,255,0.9)');
+    grd.addColorStop(1,'rgba(30,60,70,0.9)');
+    X.fillStyle=grd; X.beginPath(); X.arc(0,0,r,0,Math.PI*2); X.fill();
+
+    // dokular (basit procedural)
+    if(name==='Sun'){
+      // parlak güneş: granül
+      for(let i=0;i<18;i++){ const a=Math.random()*Math.PI*2, rr=r*(0.2+Math.random()*0.8); X.fillStyle='rgba(255,200,80,0.15)'; X.beginPath(); X.arc(Math.cos(a)*rr*0.6,Math.sin(a)*rr*0.6, r*0.2,0,Math.PI*2); X.fill(); }
+      // corona
+      let g2=X.createRadialGradient(0,0,0,0,0,r*1.5); g2.addColorStop(0,'rgba(255,210,100,0.5)'); g2.addColorStop(1,'rgba(255,210,100,0)'); X.fillStyle=g2; X.beginPath(); X.arc(0,0,r*1.5,0,Math.PI*2); X.fill();
+    } else if(name==='Saturn'){
+      // bantlar
+      X.globalAlpha=.25; for(let i=-3;i<=3;i++){ X.beginPath(); X.ellipse(0,i*3, r*0.95, r*0.35, rot+i*0.12, 0, Math.PI*2); X.strokeStyle='rgba(210,200,160,0.45)'; X.lineWidth=1; X.stroke(); } X.globalAlpha=1;
+      // halka
+      X.globalAlpha=.6; X.beginPath(); X.ellipse(0,0,r*1.9,r*0.6,0,0,Math.PI*2); X.strokeStyle='rgba(230,220,190,0.3)'; X.lineWidth=6; X.stroke(); X.globalAlpha=1;
+    } else if(name==='Uranus'){
+      X.globalAlpha=.25; for(let i=-2;i<=2;i++){ X.beginPath(); X.ellipse(0,i*3, r*0.95, r*0.35, rot+i*0.14, 0, Math.PI*2); X.strokeStyle='rgba(170,230,230,0.5)'; X.lineWidth=1; X.stroke(); } X.globalAlpha=1;
+      X.globalAlpha=.35; X.beginPath(); X.ellipse(0,0,r*1.6,r*0.52,0,0,Math.PI*2); X.strokeStyle='rgba(170,230,230,0.25)'; X.lineWidth=3; X.stroke(); X.globalAlpha=1;
+    } else if(name==='Neptune'){
+      X.globalAlpha=.25; for(let i=-2;i<=2;i++){ X.beginPath(); X.ellipse(0,i*3, r*0.95, r*0.35, rot+i*0.12, 0, Math.PI*2); X.strokeStyle='rgba(120,160,255,0.5)'; X.lineWidth=1; X.stroke(); } X.globalAlpha=1;
+    } else if(name==='Venus'){
+      X.globalAlpha=.18; for(let i=-3;i<=3;i++){ X.beginPath(); X.ellipse(0,i*2.5, r*0.95, r*0.35, rot+i*0.08, 0, Math.PI*2); X.strokeStyle='rgba(255,230,170,0.55)'; X.lineWidth=1; X.stroke(); } X.globalAlpha=1;
+    } else if(name==='Moon'){
+      // krater noktaları
+      for(let i=0;i<20;i++){ const a=Math.random()*Math.PI*2, rr=r*(0.2+Math.random()*0.9); X.fillStyle='rgba(200,210,220,0.24)'; X.beginPath(); X.arc(Math.cos(a)*rr*0.6,Math.sin(a)*rr*0.6, 1.2+Math.random()*1.8,0,Math.PI*2); X.fill(); }
+    } else {
+      // mini gezegen
+      X.globalAlpha=.2; X.beginPath(); X.ellipse(0,0, r*0.9, r*0.35, rot,0,Math.PI*2); X.strokeStyle='rgba(200,230,255,0.3)'; X.stroke(); X.globalAlpha=1;
+    }
+  }
+
+  function drawAngels(){
+    X.save(); X.translate(W/2,H/2); const t=st.t;
+
+    // Oyuncu: Mira Novam (ışıktan silüet + beyaz tüy kanatlar + pelerin animasyonu)
+    const x=st.player.x, y=st.player.y+Math.sin(t*3)*1.2;
+    // aura
+    let grad=X.createRadialGradient(x,y,0,x,y,20); grad.addColorStop(0,'rgba(140,240,255,0.9)'); grad.addColorStop(1,'rgba(140,240,255,0)'); X.fillStyle=grad; X.beginPath(); X.arc(x,y,20,0,Math.PI*2); X.fill();
+    // baş
+    X.fillStyle='#fff'; X.beginPath(); X.arc(x,y-12,8,0,Math.PI*2); X.fill();
+    // beden
+    X.beginPath(); X.ellipse(x,y+6,10,16,0,0,Math.PI*2); X.fill();
+    // mavi taç
+    X.fillStyle='#72b7ff'; X.beginPath(); X.moveTo(x-8,y-22); X.lineTo(x-2,y-16); X.lineTo(x+2,y-22); X.lineTo(x+8,y-16); X.lineTo(x+8,y-14); X.lineTo(x-8,y-14); X.closePath(); X.fill();
+    // pelerin (animasyon)
+    X.fillStyle='rgba(200,240,255,0.25)'; X.beginPath(); X.moveTo(x-6,y+2); X.quadraticCurveTo(x-24,y+16+Math.sin(t*2)*6,x-2,y+28); X.lineTo(x+2,y+28); X.quadraticCurveTo(x+24,y+16+Math.cos(t*2)*6,x+6,y+2); X.closePath(); X.fill();
+    // Mira Novam kanatları (büyük beyaz tüy)
+    for(let side=-1; side<=1; side+=2){
+      X.save(); X.translate(x,y-6);
+      const flap = Math.sin(t*3+side*0.7)*0.35;
+      X.rotate(flap + (side<0?-0.25:0.25));
+      for(let f=0; f<24; f++){
+        const yy = -f*4.1, xx = side*(14 + f*1.15);
+        const len = 20+f*1.4;
+        const grd=X.createRadialGradient(xx,yy,0,xx,yy,len);
+        grd.addColorStop(0,'rgba(255,255,255,0.98)');
+        grd.addColorStop(1,'rgba(255,255,255,0)');
+        X.fillStyle=grd;
+        X.beginPath();
+        X.ellipse(xx,yy, 14, 6.5, 0, 0, Math.PI*2);
+        X.fill();
+      }
+      // omurga
+      X.strokeStyle='rgba(255,255,255,0.6)';
+      X.beginPath(); X.moveTo(0,0); X.lineTo(side*28,-80); X.stroke();
+      X.restore();
+    }
+    // rehber ışını (en yakın nura)
+    let target=null, best=1e9; for(const o of st.orbs){ const dx=o.x-x, dy=o.y-y, d=dx*dx+dy*dy; if(d<best){ best=d; target=o; } }
+    if(target){ X.strokeStyle='rgba(110,255,230,0.32)'; X.lineWidth=2; X.beginPath(); X.moveTo(x,y); const mx=(x+target.x)/2, my=(y+target.y)/2-18; X.quadraticCurveTo(mx,my,target.x,target.y); X.stroke(); }
+
+    // Etrafı dolaşan ışık melekleri (koruyucu kanatlar)
+    for(const a of st.angels){
+      const ang=t*a.s+a.o; const ax=Math.cos(ang)*a.r; const ay=Math.sin(ang)*a.r*.55-a.h;
+      // tüy kanatlar
+      for(let side=-1; side<=1; side+=2){
+        X.save(); X.translate(ax,ay);
+        const flap2 = Math.sin(t*2+side*0.7)*0.25;
+        X.rotate(flap2 + (side<0?-0.2:0.2));
+        for(let f=0; f<18; f++){
+          const yy = -f*4.2, xx = side*(12 + f*1.1);
+          const len = 20+f*1.3;
+          const grd2=X.createRadialGradient(xx,yy,0,xx,yy,len);
+          grd2.addColorStop(0,'rgba(255,255,255,0.98)');
+          grd2.addColorStop(1,'rgba(255,255,255,0)');
+          X.fillStyle=grd2;
+          X.beginPath(); X.ellipse(xx,yy, 13.5, 6, 0, 0, Math.PI*2); X.fill();
+        }
+        X.strokeStyle='rgba(255,255,255,0.6)'; X.beginPath(); X.moveTo(0,0); X.lineTo(side*24,-68); X.stroke();
+        X.restore();
+      }
+      // hale
+      const pulse=11+Math.sin(t*2+a.phase)*6; let g=X.createRadialGradient(ax,ay,0,ax,ay,pulse*2); g.addColorStop(0,'rgba(255,255,255,0.96)'); g.addColorStop(1,'rgba(255,255,255,0)'); X.fillStyle=g; X.beginPath(); X.arc(ax,ay,pulse*2,0,Math.PI*2); X.fill();
+      X.fillStyle='rgba(255,255,255,0.96)'; X.beginPath(); X.arc(ax,ay,5,0,Math.PI*2); X.fill();
+    }
+
+    X.restore();
+  }
+
+  function drawThrone(){
+    X.save(); X.translate(W/2,H/2); const t=st.t, x=st.throne.x,y=st.throne.y,r=st.throne.r;
+    // altın parıltı
+    let gl=X.createRadialGradient(x,y,0,x,y,r*2+Math.sin(t*2)*6); gl.addColorStop(0,'rgba(255,230,120,0.85)'); gl.addColorStop(1,'rgba(255,230,120,0)'); X.fillStyle=gl; X.beginPath(); X.arc(x,y,r*2,0,Math.PI*2); X.fill();
+    // taht gövde
+    X.fillStyle='var(--gold)'; X.strokeStyle='var(--goldLine)'; X.lineWidth=2;
+    X.beginPath(); X.roundRect(x-34,y-14,68,10,4); X.fill(); X.stroke();
+    X.beginPath(); X.roundRect(x-32,y-24,64,10,4); X.fill(); X.stroke();
+    X.beginPath(); X.roundRect(x-24,y-60,48,32,8); X.fill(); X.stroke();
+    for(let i=0;i<34;i++){ const a=(i/34)*Math.PI*2; const len=96+Math.sin(t*3+i)*12; X.strokeStyle='rgba(255,230,140,0.45)'; X.lineWidth=1.2; X.beginPath(); X.moveTo(x,y); X.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len); X.stroke(); }
+    // gerçekçi beyaz kuzu (stilize ama doğal)
+    const lx=x, ly=y-30+Math.sin(t*3)*1.0;
+    // gövde
+    X.fillStyle='#ffffff'; X.beginPath(); X.ellipse(lx,ly,17,10,0,0,Math.PI*2); X.fill();
+    // baş
+    X.beginPath(); X.arc(lx+12,ly-7,6.8,0,Math.PI*2); X.fill();
+    // kulak
+    X.fillStyle='#eef6ff'; X.beginPath(); X.ellipse(lx+14,ly-9, 2.4,4, -0.6, 0,Math.PI*2); X.fill();
+    // göz
+    X.fillStyle='#1b2730'; X.beginPath(); X.arc(lx+15,ly-7,1.5,0,Math.PI*2); X.fill();
+    X.restore();
+  }
+
+  function drawRingsAndFires(){
+    X.save(); X.translate(W/2,H/2);
+    // eliptik renkli halkalar
+    for(const R of st.rings){
+      X.globalAlpha=.24; X.beginPath(); X.ellipse(0,0,R.r,R.r*.55,0,0,Math.PI*2); X.strokeStyle='rgba(200,240,255,0.25)'; X.lineWidth=1.3; X.stroke(); X.globalAlpha=1;
+    }
+    // ana alev topları
+    for(const f of st.fires){
+      const R=st.rings[f.ring]; const ang=(R.a||0)+f.off;
+      const x=Math.cos(ang)*R.r, y=Math.sin(ang)*R.r*0.55;
+      const col = R.hue[(Math.floor((ang%(Math.PI*2))/(Math.PI*2)*R.hue.length)+R.hue.length)%R.hue.length] || 30;
+      let gr=X.createRadialGradient(x,y,0,x,y,f.size*1.8); gr.addColorStop(0,`hsla(${col}, 90%, 60%, 0.9)`); gr.addColorStop(1,'rgba(255,160,60,0)'); X.fillStyle=gr; X.beginPath(); X.arc(x,y,f.size*1.8,0,Math.PI*2); X.fill();
+      X.fillStyle='rgba(255,255,230,0.9)'; X.beginPath(); X.arc(x,y,f.size*.7,0,Math.PI*2); X.fill();
+    }
+    X.restore();
+  }
+
+  function drawOrbs(){
+    X.save(); X.translate(W/2,H/2);
+    for(const o of st.orbs){
+      const r=10+Math.sin(o.spin*2)*1.8;
+      let core='#fffef2', aura='rgba(255,255,220,0.95)';
+      if(o.type==='emerald'){core='#c8fff2';aura='rgba(110,255,210,0.95)';}
+      if(o.type==='azure'){core='#d2e3ff';aura='rgba(150,190,255,0.95)';}
+      if(o.type==='diamond'){core='#f6fbff';aura='rgba(220,240,255,0.98)';}
+      const grad=X.createRadialGradient(o.x,o.y,0,o.x,o.y,r*2.8); grad.addColorStop(0,aura); grad.addColorStop(1,'rgba(255,255,220,0)'); X.fillStyle=grad; X.beginPath(); X.arc(o.x,o.y,r*2.4,0,Math.PI*2); X.fill();
+      X.fillStyle=core; X.beginPath(); X.arc(o.x,o.y,r*.9,0,Math.PI*2); X.fill();
+    }
+    X.restore();
+  }
+
+  function drawTreasures(){
+    X.save(); X.translate(W/2,H/2);
+    for(const t of st.treasures){
+      if(!t.visible) continue;
+      X.save(); X.translate(t.x,t.y);
+      if(t.type==='emerald' || t.type==='gold' || t.type==='diamond'){
+        // sandık
+        let ring=X.createRadialGradient(0,0,0,0,0,28); ring.addColorStop(0,'rgba(255,230,160,0.22)'); ring.addColorStop(1,'rgba(255,230,160,0)'); X.fillStyle=ring; X.beginPath(); X.arc(0,0,28,0,Math.PI*2); X.fill();
+        X.fillStyle='#7a4e20'; X.strokeStyle='#3a2410'; X.lineWidth=1.5; X.beginPath(); X.roundRect(-14,-10,28,20,4); X.fill(); X.stroke();
+        X.fillStyle='#a56d2a'; X.fillRect(-14,-2,28,4);
+        // içerik parıltısı
+        const glow = t.type==='emerald' ? 'rgba(60,255,210,0.9)' : t.type==='diamond' ? 'rgba(200,240,255,0.95)' : 'rgba(255,220,120,0.95)';
+        let gr=X.createRadialGradient(0,-8,0,0,-8,22); gr.addColorStop(0,glow); gr.addColorStop(1,'rgba(255,255,255,0)'); X.fillStyle=gr; X.beginPath(); X.arc(0,-8,22,0,Math.PI*2); X.fill();
+        // mücevher şekli
+        if(t.type==='emerald'){ X.fillStyle='var(--emerald)'; X.beginPath(); X.moveTo(-6,2); X.lineTo(0,-8); X.lineTo(6,2); X.lineTo(0,10); X.closePath(); X.fill(); }
+        if(t.type==='diamond'){ X.fillStyle='#e8f7ff'; X.beginPath(); X.moveTo(0,-12); X.lineTo(12,2); X.lineTo(0,14); X.lineTo(-12,2); X.closePath(); X.fill(); }
+        if(t.type==='gold'){ X.fillStyle='var(--gold)'; X.beginPath(); X.roundRect(-10,4,20,8,2); X.fill(); }
+      } else if(t.type==='book'){
+        // uçan gemi gibi Bilgelik Kitabı + zümrüt yeşili ışınlar
+        let gr=X.createRadialGradient(0,0,0,0,0,32); gr.addColorStop(0,'rgba(180,220,255,0.9)'); gr.addColorStop(1,'rgba(180,220,255,0)'); X.fillStyle=gr; X.beginPath(); X.arc(0,0,32,0,Math.PI*2); X.fill();
+        X.fillStyle='#d8efff'; X.beginPath(); X.roundRect(-16,-9,32,18,3); X.fill();
+        X.fillStyle='#8fb8ff'; X.fillRect(-1,-9,2,18);
+        // gemi pruvası hissi
+        X.fillStyle='rgba(140,200,255,0.6)'; X.beginPath(); X.moveTo(16,-9); X.lineTo(24,-3); X.lineTo(16,0); X.closePath(); X.fill();
+        // yeşil nur ışınları
+        for(let i=0;i<9;i++){ const a=i/9*Math.PI*2; X.strokeStyle='rgba(60,255,210,0.6)'; X.beginPath(); X.moveTo(Math.cos(a)*10,Math.sin(a)*8); X.lineTo(Math.cos(a)*28,Math.sin(a)*22); X.stroke(); }
+      } else if(t.type==='sword'){
+        let gr2=X.createRadialGradient(0,0,0,0,0,28); gr2.addColorStop(0,'rgba(255,210,120,0.85)'); gr2.addColorStop(1,'rgba(255,210,120,0)'); X.fillStyle=gr2; X.beginPath(); X.arc(0,0,28,0,Math.PI*2); X.fill();
+        X.strokeStyle='rgba(255,240,200,0.95)'; X.lineWidth=3; X.beginPath(); X.moveTo(0,-14); X.lineTo(0,14); X.stroke();
+        X.strokeStyle='rgba(255,210,120,0.95)'; X.lineWidth=5; X.beginPath(); X.moveTo(-10,2); X.lineTo(10,2); X.stroke();
+      }
+      // hazine koruma alevleri
+      if(t.guard && t.guards){
+        for(const g of t.guards){
+          let gg=X.createRadialGradient(g.x-t.x,g.y-t.y,0,g.x-t.x,g.y-t.y,(g.size||10)*1.6); gg.addColorStop(0,'rgba(255,160,60,0.85)'); gg.addColorStop(1,'rgba(255,160,60,0)'); X.fillStyle=gg; X.beginPath(); X.arc(g.x-t.x,g.y-t.y,(g.size||10)*1.6,0,Math.PI*2); X.fill();
+          X.fillStyle='rgba(255,255,230,0.9)'; X.beginPath(); X.arc(g.x-t.x,g.y-t.y,(g.size||10)*0.7,0,Math.PI*2); X.fill();
+        }
+      }
+      X.restore();
+    }
+    X.restore();
+  }
+
+  function drawBook(){
+    if(!st.book && !st.treasures.some(t=>t.carry==='book')) return;
+    X.save(); X.translate(W/2,H/2);
+    if(st.book){
+      const b=st.bookEnt;
+      let gr=X.createRadialGradient(b.x,b.y,0,b.x,b.y,26); gr.addColorStop(0,'rgba(180,220,255,0.7)'); gr.addColorStop(1,'rgba(180,220,255,0)'); X.fillStyle=gr; X.beginPath(); X.arc(b.x,b.y,26,0,Math.PI*2); X.fill();
+      X.fillStyle='#d8efff'; X.beginPath(); X.roundRect(b.x-12,b.y-8,24,16,3); X.fill();
+      X.fillStyle='#8fb8ff'; X.fillRect(b.x-1,b.y-8,2,16);
+      // yeşil saçaklar
+      X.strokeStyle='rgba(60,255,210,0.55)'; for(let i=0;i<6;i++){ X.beginPath(); X.moveTo(b.x+Math.cos(i)*5,b.y+Math.sin(i)*5); X.lineTo(b.x+Math.cos(i)*12,b.y+Math.sin(i)*12); X.stroke(); }
+    }
+    X.restore();
+  }
+
+  // ====== Loop ======
+  let last=performance.now();
+  function loop(now){
+    const dt=Math.min(.033,(now-last)/1000); last=now;
+    if(st.started && !st.paused && !st.won && !st.over) step(dt);
+    drawBG(); drawGalaxies(); drawPlanets(); drawRingsAndFires(); drawThrone(); drawOrbs(); drawTreasures(); drawAngels(); drawBook();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // Defaults
+  setDifficulty('Medium'); loadLevel(0); st.started=false; show(intro,true);
+
+  // ====== Leaderboard (Cloud + Local fallback) ======
+  function saveLocalScore(res){
+    const key='it_local_scores';
+    const arr = JSON.parse(localStorage.getItem(key)||'[]');
+    arr.push({...res, ts: Date.now(), displayName: (nick.value||'Anonim')});
+    arr.sort((a,b)=> b.totalScore - a.totalScore);
+    localStorage.setItem(key, JSON.stringify(arr.slice(0,100)));
+  }
+  async function loadTopScores(){
+    const tbody = document.querySelector('#tbl tbody'); tbody.innerHTML='';
+    let rows=[];
+    try{
+      if(CLOUD.baseURL && CLOUD.baseURL.startsWith('http')){
+        const r = await fetch(CLOUD.baseURL + CLOUD.topPath, {mode:'cors'});
+        if(r.ok){ rows = await r.json(); }
+      }
+    }catch(e){ /* ignore */ }
+    if(!rows || !rows.length){
+      rows = JSON.parse(localStorage.getItem('it_local_scores')||'[]');
+    }
+    rows = rows.slice(0,100);
+    rows.forEach((r,i)=>{
+      const tr=document.createElement('tr');
+      const td = (t)=>{ const d=document.createElement('td'); d.textContent=t; return d; };
+      tr.appendChild(td(i+1));
+      tr.appendChild(td(r.displayName || 'Anonim'));
+      tr.appendChild(td(r.totalScore ?? r.score ?? 0));
+      tr.appendChild(td('★'.repeat(r.stars||1)));
+      tr.appendChild(td(r.level||'-'));
+      tr.appendChild(td((r.timeSec||0)+'s'));
+      tbody.appendChild(tr);
+    });
+  }
+  async function submitLastScore(){
+    if(!st.lastResult){ alert('Henüz bitmiş bir oyun sonucu yok.'); return; }
+    const payload = {
+      displayName: (nick.value||''),
+      totalScore: st.lastResult.totalScore,
+      score: st.lastResult.score,
+      stars: st.lastResult.stars,
+      timeSec: st.lastResult.timeSec,
+      level: st.lastResult.level,
+      country: ''
+    };
+    let ok=false;
+    try{
+      if(CLOUD.baseURL && CLOUD.baseURL.startsWith('http')){
+        const r = await fetch(CLOUD.baseURL + CLOUD.submitPath, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        ok = r.ok;
+      }
+    }catch(e){ ok=false; }
+    saveLocalScore({...payload});
+    alert(ok? 'Buluta gönderildi + yerelde kaydedildi.' : 'Buluta ulaşılamadı (yerelde kaydedildi).');
+    loadTopScores();
+  }
+
+})();
+</script>
+</body>
+</html>
